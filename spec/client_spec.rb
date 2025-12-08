@@ -138,7 +138,12 @@ describe PG::LogicalReplication::Client do
   end
 
   context "with a subscription" do
-    let(:subscription_conninfo) { pub_connection.conninfo_hash.delete_if { |k, v| v == "" || v.nil? } }
+    let(:subscription_conninfo) do
+      pub_connection
+        .conninfo_hash
+        .slice(:user, :password, :host, :port, :dbname, :sslmode)
+        .delete_if { |k, v| v.nil? || v.empty? }
+    end
 
     before do
       pub_client.create_publication(pub_name, true)
